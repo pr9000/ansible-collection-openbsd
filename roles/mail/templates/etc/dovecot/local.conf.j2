@@ -8,7 +8,7 @@ lda_mailbox_autosubscribe = yes
 mail_location = maildir:~/Mail
 mail_max_userip_connections = 100
 postmaster_address = postmaster@{{ mail_domain }}
-protocols = imap lmtp
+protocols = imap lmtp sieve
 ssl = required
 ssl_cert = </etc/ssl/{{ mail_domain }}.fullchain.pem
 ssl_key = </etc/ssl/private/{{ mail_domain }}.key
@@ -42,6 +42,7 @@ namespace inbox {
 
 plugin {
 	sieve = file:~/Mail/dovecot.sieve
+	sieve_dir = ~/Mail/sieve
 	sieve_global_extensions = +vnd.dovecot.environment
 	sieve_plugins = sieve_imapsieve
 	sieve_user_log = ~/Mail/dovecot.sieve.log
@@ -74,6 +75,12 @@ service lmtp {
 		# https://github.com/OpenSMTPD/OpenSMTPD/commit/f682a707ff6e72011db359c7cc72697a82ef4299
 		# TODO: jcmdln: Use a forward file? Per user?
 		mode = 0666
+	}
+}
+
+service managesieve-login {
+	inet_listener sieve {
+		port = 4190
 	}
 }
 
